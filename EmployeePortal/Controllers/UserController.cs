@@ -88,18 +88,63 @@ namespace EmployeePortal.Controllers
             return Unauthorized(new { Message = "Invalid credentials" });
         }
 
-
         // Get list of Users
         [Authorize]
-        [HttpGet]
+        [HttpGet("users")]
         public async Task<ActionResult> UserList()
         {
             var users = await _userRepository.GetAllUsersAsync();
+            return Ok(users);
+        }
+
+        // Get list of Users with paggination
+        [Authorize]
+        [HttpGet("usersWithPagi")]
+        public async Task<ActionResult> UserList(int pageNumber = 1, int pageSize = 5)
+        {
+            var (users, totalCount) = await _userRepository.GetAllUsersAsync(pageNumber, pageSize);
+
             foreach (var user in users)
             {
                 user.Password = "***";
             }
-            return Ok(users);
+
+            var totalPages = (int)Math.Ceiling((double)totalCount / pageSize); 
+
+            return Ok(new
+            {
+                users,        
+                totalCount,   
+                totalPages,   
+            });
+        }
+
+        [HttpPut("{id}/status")]
+        [Authorize]
+        public async Task<ActionResult> UpdateUserStatus(int id, [FromBody] UpdateStatusDTO statusDTO)
+        {
+            if (statusDTO == null || (statusDTO.Status != true && statusDTO.Status != false))
+            {
+                return BadRequest(new { Message = "Invalid status value" });
+            }
+
+            var user = await _userRepository.GetUserByIdAsync(id);
+
+            if (user == null)
+            {
+                return NotFound(new { Message = "User not found" });
+            }
+
+            user.Status = statusDTO.Status;
+
+            var updatedUser = await _userRepository.UpdateUserAsync(user);
+
+            if (updatedUser == null)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "Failed to update user status" });
+            }
+
+            return Ok(new { Message = "User status updated successfully", User = updatedUser });
         }
     }
 }

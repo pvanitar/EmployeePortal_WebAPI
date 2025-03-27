@@ -36,11 +36,36 @@ namespace EmployeePortal.Repository
                 .FirstOrDefaultAsync();
         }
 
-        
-        // Get all employees
+        // Get all users
         public async Task<List<User>> GetAllUsersAsync()
         {
-            return await _dbContext.Users.ToListAsync();
+            var users = await _dbContext.Users.ToListAsync();
+            return (users);
+        }
+
+        // Get all users with paggination
+        public async Task<(List<User> users, int totalCount)> GetAllUsersAsync(int pageNumber, int pageSize)
+        {
+            var totalCount = await _dbContext.Users.CountAsync();
+            var users = await _dbContext.Users
+                           .Skip((pageNumber - 1) * pageSize)
+                           .Take(pageSize)
+                           .ToListAsync();
+
+            return (users, totalCount);
+        }
+
+
+        public async Task<User> GetUserByIdAsync(int id)
+        {
+            return await _dbContext.Users.FindAsync(id);
+        }
+
+        public async Task<User> UpdateUserAsync(User user)
+        {
+            _dbContext.Users.Update(user);
+            await _dbContext.SaveChangesAsync();
+            return user;
         }
     }
 }
