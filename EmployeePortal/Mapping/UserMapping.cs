@@ -19,6 +19,15 @@ namespace EmployeePortal.Mapping
             // Mapping from UpdateStatusDTO to User
             CreateMap<UpdateStatusDTO, User>()
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status));
+
+            // Mapping from Device to DeviceDTO
+            CreateMap<Device, DeviceDTO>()
+                 .ForMember(dest => dest.DeviceName, opt => opt.MapFrom(src => src.DeviceName));
+
+            // Mapping from DeviceDTO to Device
+            CreateMap<DeviceDTO, Device>()
+                .ForMember(dest => dest.DeviceName, opt => opt.MapFrom(src => src.DeviceName));
+
         }
     }
 }

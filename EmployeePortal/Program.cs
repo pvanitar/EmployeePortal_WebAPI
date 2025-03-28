@@ -23,6 +23,7 @@ builder.Services.AddAutoMapper(typeof(UserMapping));
 
 builder.Services.AddScoped<EmployeeRepository>();
 builder.Services.AddScoped<UserRepository>();
+builder.Services.AddScoped<DeviceRepository>();
 
 builder.Services.AddCors(options =>
 {
